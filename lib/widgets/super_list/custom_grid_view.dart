@@ -208,7 +208,8 @@ class TransactionDataSource extends DataGridSource {
     _transactionData = transactionData
         .map<DataGridRow>((e) => DataGridRow(cells: [
               DataGridCell<String>(columnName: 'Name', value: e.name),
-              DataGridCell<String>(columnName: 'Date', value: e.date),
+              DataGridCell<String>(
+                  columnName: 'Date', value: e.date.formatDate),
               DataGridCell<String>(columnName: 'Category', value: e.category),
               DataGridCell<double>(columnName: 'Amount', value: e.amount),
               DataGridCell<String>(
