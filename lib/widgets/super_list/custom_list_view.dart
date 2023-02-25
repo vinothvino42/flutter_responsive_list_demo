@@ -140,7 +140,7 @@ class CustomListItem extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          flex: 2,
+          flex: 3,
           child: Text(
             title,
             style: const TextStyle(

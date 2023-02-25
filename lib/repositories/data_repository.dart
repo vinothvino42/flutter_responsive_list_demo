@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_responsive_list_demo/models/data_grid.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,7 +16,12 @@ class DataRepository {
   Future<List<List<DataGrid>>> getAllGridItems(String api) async {
     try {
       final response = await Dio().get(api);
-      final json = response.data as Map<String, dynamic>?;
+      Map<String, dynamic>? json = {};
+      if (response.data is Map<String, dynamic>) {
+        json = response.data as Map<String, dynamic>?;
+      } else {
+        json = jsonDecode(response.data) as Map<String, dynamic>;
+      }
       if (json == null) return [];
       final jsonList = json['data'] as List<dynamic>?;
       if (jsonList == null) return [];

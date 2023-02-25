@@ -26,9 +26,14 @@ class DataGrid {
   static String getType(Type runtimeType, dynamic value) {
     switch (runtimeType) {
       case String:
-        final date = DateTime.tryParse(value);
-        if (date != null) return 'date';
-        return 'string';
+        try {
+          final date = DateTime.tryParse(value);
+          if (date != null) return 'date';
+          return 'string';
+        } catch (e) {
+          return 'string';
+        }
+
       case int:
         return 'int';
       case double:

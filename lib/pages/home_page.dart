@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_responsive_list_demo/constants/app_constants.dart';
 import 'package:flutter_responsive_list_demo/utils/sizes.dart';
 import 'package:flutter_responsive_list_demo/widgets/super_list/super_list_config.dart';
 
@@ -30,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Test'),
+        title: const Text(AppConstants.homeAppBarTitle),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
                   decoration: const InputDecoration(hintText: 'Enter your URL'),
                 ),
               ),
-              const SizedBox(height: Sizes.paddingV12),
+              const SizedBox(height: 50),
               ElevatedButton(
                 onPressed: _submit,
                 child: const Text('Submit'),
