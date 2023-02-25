@@ -13,7 +13,6 @@ class DataGrid {
 
   static DataGrid fromJson(String key, dynamic value) {
     final String type = getType(value.runtimeType, value);
-    // final String type = 'type';
     final String label = key.capitalizeFirstLetter;
 
     return DataGrid(
