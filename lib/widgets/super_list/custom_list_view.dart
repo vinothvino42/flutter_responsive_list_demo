@@ -22,7 +22,7 @@ class CustomListView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.appBar),
+        title: const Text(AppConstants.appBarTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),

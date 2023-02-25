@@ -9,7 +9,7 @@ part 'data_controller.freezed.dart';
 part 'data_controller.g.dart';
 
 final firstItemProvider = StateProvider<int>((_) => 0);
-final secondItemProvider = StateProvider<int>((_) => 0);
+final secondItemProvider = StateProvider<int>((_) => 1);
 final keyListProvider = StateProvider<List<DataGrid>>((_) => []);
 
 @freezed

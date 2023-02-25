@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dynamic Data Grid & List'),
+        title: const Text('Flutter Test'),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(

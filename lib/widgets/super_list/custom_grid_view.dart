@@ -4,6 +4,7 @@ import 'package:flutter_responsive_list_demo/utils/datex.dart';
 import 'package:flutter_responsive_list_demo/widgets/super_list/super_list_config.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+import '../../constants/app_constants.dart';
 import '../../controllers/data_controller.dart';
 import '../../models/data_grid.dart';
 
@@ -57,16 +58,21 @@ class CustomGridView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dataState = ref.watch(dataControllerProvider(config.url));
 
-    return dataState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err) => Center(
-              child: Text('Error: $err'),
-            ),
-        success: (multiDataGrids) => multiDataGrids.isEmpty
-            ? const Center(
-                child: Text('No data found'),
-              )
-            : DataGridView(multiDataGrids: multiDataGrids));
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(AppConstants.appBarTitle),
+      ),
+      body: dataState.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err) => Center(
+                child: Text('Error: $err'),
+              ),
+          success: (multiDataGrids) => multiDataGrids.isEmpty
+              ? const Center(
+                  child: Text('No data found'),
+                )
+              : DataGridView(multiDataGrids: multiDataGrids)),
+    );
   }
 }
 
