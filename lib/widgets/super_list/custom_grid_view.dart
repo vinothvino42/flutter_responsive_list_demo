@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_responsive_list_demo/models/transaction.dart';
 import 'package:flutter_responsive_list_demo/utils/datex.dart';
 import 'package:flutter_responsive_list_demo/widgets/super_list/super_list_config.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../controllers/data_controller.dart';
-import '../../utils/sizes.dart';
-import 'custom_list_item.dart';
+import '../../models/data_grid.dart';
 
 enum GridCrossAxisType {
   xxs,
@@ -57,171 +55,106 @@ class CustomGridView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dataState = ref.watch(dataController(config.url));
+    final dataState = ref.watch(dataControllerProvider(config.url));
 
     return dataState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err) => Center(
               child: Text('Error: $err'),
             ),
-        success: (transactions) => transactions.isEmpty
+        success: (multiDataGrids) => multiDataGrids.isEmpty
             ? const Center(
                 child: Text('No data found'),
               )
-            : DataGridView(transactions: transactions)
-        // : GridView.count(
-        //     mainAxisSpacing: Sizes.screenMarginH16,
-        //     crossAxisSpacing: Sizes.screenMarginH16,
-        //     crossAxisCount: crossAxisType.getCrossAxis,
-        //     children: List.generate(
-        //       transactions.length,
-        //       (index) => CustomGridItem(
-        //         config: config,
-        //         transaction: transactions[index],
-        //       ),
-        //     ),
-        //   ),
-        );
+            : DataGridView(multiDataGrids: multiDataGrids));
   }
 }
-
-// class CustomGridItem extends StatelessWidget {
-//   const CustomGridItem({
-//     super.key,
-//     required this.config,
-//     required this.transaction,
-//   });
-
-//   final SuperListConfig config;
-//   final Transaction transaction;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(Corners.radius10),
-//         boxShadow: [
-//           BoxShadow(
-//             color: const Color(0xff333333).withOpacity(.15),
-//             spreadRadius: 0,
-//             blurRadius: 10,
-//           ),
-//         ],
-//       ),
-//       padding: const EdgeInsets.all(Sizes.paddingH12),
-//       child: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           CustomListItem(title: 'Name: ', value: transaction.name),
-//           CustomListItem(title: 'Date: ', value: transaction.date.formatDate),
-//           CustomListItem(title: 'Category: ', value: transaction.category),
-//           CustomListItem(title: 'Amount: ', value: '${transaction.amount}'),
-//           CustomListItem(
-//             title: 'Created At: ',
-//             value: transaction.createdAt.formatDate,
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 class DataGridView extends StatefulWidget {
   const DataGridView({
     super.key,
-    required this.transactions,
+    required this.multiDataGrids,
   });
 
-  final List<Transaction> transactions;
+  final List<List<DataGrid>> multiDataGrids;
 
   @override
   State<DataGridView> createState() => _DataGridViewState();
 }
 
 class _DataGridViewState extends State<DataGridView> {
-  List<Transaction> transactions = [];
-  late TransactionDataSource transactionDataSource;
+  List<DataGrid> _dataGridColumns = [];
+  List<List<DataGrid>> _dataGrids = [];
+  late GridDataSource _gridDataSource;
 
   @override
   void initState() {
     super.initState();
-    transactions = widget.transactions;
-    transactionDataSource =
-        TransactionDataSource(transactionData: transactions);
+    _dataGridColumns = widget.multiDataGrids.first;
+    _dataGrids = widget.multiDataGrids;
+    _gridDataSource = GridDataSource(multiDataGrids: _dataGrids);
   }
 
   @override
   Widget build(BuildContext context) {
     return SfDataGrid(
-      source: transactionDataSource,
+      isScrollbarAlwaysShown: true,
+      source: _gridDataSource,
       columnWidthMode: ColumnWidthMode.fill,
-      columns: <GridColumn>[
-        GridColumn(
-            columnName: 'Name',
-            label: Container(
-                padding: const EdgeInsets.all(16.0),
-                alignment: Alignment.center,
-                child: const Text(
-                  'Name',
-                ))),
-        GridColumn(
-            columnName: 'Date',
-            label: Container(
-                padding: const EdgeInsets.all(8.0),
-                alignment: Alignment.center,
-                child: const Text('Date'))),
-        GridColumn(
-          columnName: 'Category',
+      columns: List.generate(
+        _dataGridColumns.length,
+        (index) => GridColumn(
+          columnName: _dataGridColumns[index].label,
           label: Container(
-            padding: const EdgeInsets.all(8.0),
+            color: Colors.blue,
+            padding: const EdgeInsets.all(16.0),
             alignment: Alignment.center,
-            child: const Text(
-              'Category',
-              overflow: TextOverflow.ellipsis,
+            child: Text(
+              _dataGridColumns[index].label,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ),
-        GridColumn(
-          columnName: 'Amount',
-          label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: const Text('Amount'),
-          ),
-        ),
-        GridColumn(
-          columnName: 'Created At',
-          label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: const Text('Created At'),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class TransactionDataSource extends DataGridSource {
-  TransactionDataSource({required List<Transaction> transactionData}) {
-    _transactionData = transactionData
-        .map<DataGridRow>((e) => DataGridRow(cells: [
-              DataGridCell<String>(columnName: 'Name', value: e.name),
-              DataGridCell<String>(
-                  columnName: 'Date', value: e.date.formatDate),
-              DataGridCell<String>(columnName: 'Category', value: e.category),
-              DataGridCell<double>(columnName: 'Amount', value: e.amount),
-              DataGridCell<String>(
-                  columnName: 'Created At', value: e.createdAt.formatDate),
-            ]))
+class GridDataSource extends DataGridSource {
+  GridDataSource({required List<List<DataGrid>> multiDataGrids}) {
+    _dataGrids = multiDataGrids
+        .map<DataGridRow>(
+          (list) => DataGridRow(
+            cells: List.generate(
+              list.length,
+              (index) => DataGridCell<String>(
+                columnName: list[index].label,
+                value: getCellValue(
+                  list[index].type,
+                  list[index].value,
+                ),
+              ),
+            ).toList(),
+          ),
+        )
         .toList();
   }
 
-  List<DataGridRow> _transactionData = [];
+  String getCellValue(String type, dynamic value) {
+    if (type == 'date') {
+      final date = DateTime.tryParse(value);
+      if (date != null && value is String) {
+        return value.formatDate;
+      }
+      return 'Date Not Found';
+    }
+    return value.toString();
+  }
+
+  List<DataGridRow> _dataGrids = [];
 
   @override
-  List<DataGridRow> get rows => _transactionData;
+  List<DataGridRow> get rows => _dataGrids;
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {

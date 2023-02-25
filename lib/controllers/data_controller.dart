@@ -1,38 +1,39 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_responsive_list_demo/models/transaction.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../models/data_grid.dart';
 import '../repositories/data_repository.dart';
 
 part 'data_controller.freezed.dart';
+part 'data_controller.g.dart';
 
-final dataController = StateNotifierProvider.autoDispose
-    .family<DataController, DataState, String>((ref, url) {
-  final dataRepository = ref.watch(dataRepositoryProvider);
-  return DataController(url, dataRepository);
-});
+final firstItemProvider = StateProvider<int>((_) => 0);
+final secondItemProvider = StateProvider<int>((_) => 0);
+final keyListProvider = StateProvider<List<DataGrid>>((_) => []);
 
 @freezed
 class DataState with _$DataState {
   const factory DataState.loading() = DataStateLoading;
-  const factory DataState.success(List<Transaction> transactions) =
-      _DataStateSuccess;
+  const factory DataState.success(List<List<DataGrid>> transactions) =
+      DataStateSuccess;
   const factory DataState.error(String error) = DataStateError;
 }
 
-class DataController extends StateNotifier<DataState> {
-  DataController(String url, this._dataRepository)
-      : super(const DataState.loading()) {
-    getTransactions(url);
+@riverpod
+class DataController extends _$DataController {
+  @override
+  DataState build(String api) {
+    getDataGrids(api);
+    return const DataState.loading();
   }
 
-  final DataRepository _dataRepository;
-
-  Future<void> getTransactions(String api) async {
+  Future<void> getDataGrids(String api) async {
     try {
       state = const DataState.loading();
-      final interests = await _dataRepository.getAllTransactions(api);
-      state = DataState.success(interests);
+      final dataRepo = ref.read(dataRepositoryProvider);
+      final dataGrids = await dataRepo.getAllGridItems(api);
+      state = DataState.success(dataGrids);
     } catch (err) {
       state = DataState.error(err.toString());
     }

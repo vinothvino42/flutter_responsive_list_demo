@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_responsive_list_demo/widgets/super_list/responsive_layout_builder.dart';
+import 'package:flutter_responsive_list_demo/widgets/super_list/sort_view.dart';
 
-import 'super_list.dart';
-import 'super_list_config.dart';
+import '../constants/app_constants.dart';
+import '../widgets/super_list/super_list.dart';
+import '../widgets/super_list/super_list_config.dart';
 
-class SuperListView extends StatelessWidget {
-  const SuperListView({
+class SuperListPage extends StatelessWidget {
+  const SuperListPage({
     super.key,
     required this.config,
   });
